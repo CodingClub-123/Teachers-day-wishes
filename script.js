@@ -15,8 +15,9 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 1;
     }
+    #glitter { z-index: 1; }
+    #confetti { z-index: 20; } /* always above preview */
     .container {
       position: relative;
       z-index: 2;
@@ -143,33 +144,36 @@ function confettiBurst() {
   canvas.width = innerWidth; canvas.height = innerHeight;
 
   const pieces = [];
-  for (let i = 0; i < 220; i++) {
+  for (let i = 0; i < 180; i++) {
     pieces.push({
       x: canvas.width/2,
-      y: canvas.height/2 - 40,
-      vx: (Math.random()*2-1) * (Math.random()*8+3),
+      y: canvas.height/2,
+      vx: (Math.random()*2-1) * (Math.random()*8+2),
       vy: (Math.random()*-8-4),
-      g: 0.22 + Math.random()*0.08,
+      g: 0.25 + Math.random()*0.05,
       size: Math.random()*6+3,
       rot: Math.random()*Math.PI,
       vr: (Math.random()*0.2 - 0.1),
-      life: 120 + Math.random()*40,
-      shape: Math.random() < 0.3 ? 'circle' : 'rect'
+      life: 160 + Math.random()*40,
+      shape: Math.random() < 0.3 ? 'circle' : 'rect',
+      color: ['#8ab4ff','#ff7ab6','#6ee7b7','#ffd166','#c4b5fd'][Math.floor(Math.random()*5)]
     });
   }
 
-  let frames = 0;
-  (function tick(){
-    frames++;
+  function tick(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for(const p of pieces){
       p.vy += p.g;
-      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+      p.x += p.vx; 
+      p.y += p.vy; 
+      p.rot += p.vr; 
+      p.life--;
+
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
-      ctx.globalAlpha = Math.max(0, p.life/160);
-      ctx.fillStyle = ['#8ab4ff','#ff7ab6','#6ee7b7','#ffd166','#c4b5fd'][Math.floor(Math.random()*5)];
+      ctx.globalAlpha = Math.max(0, p.life/180);
+      ctx.fillStyle = p.color;
       if(p.shape === 'rect'){
         ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.7);
       } else {
@@ -177,9 +181,11 @@ function confettiBurst() {
       }
       ctx.restore();
     }
-    if(frames < 220) requestAnimationFrame(tick);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
-  })();
+    if(pieces.some(p => p.life > 0)){
+      requestAnimationFrame(tick);
+    }
+  }
+  tick();
 }
 
 /* ===== WISH GENERATION ===== */
