@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teachers' Day Wishes</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      font-family: "Poppins", sans-serif;
+    }
+
+    /* Envelope container */
+    .envelope {
+      width: 200px;
+      height: 120px;
+      background: #fff;
+      position: relative;
+      cursor: pointer;
+      animation: openEnvelope 2s forwards;
+    }
+
+    .envelope::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-left: 100px solid transparent;
+      border-right: 100px solid transparent;
+      border-bottom: 60px solid #dcdcdc;
+    }
+
+    @keyframes openEnvelope {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    /* Poster style */
+    .poster {
+      position: absolute;
+      bottom: -100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: slideUp 3s forwards;
+      animation-delay: 2s; /* Envelope disappear ku apram start */
+    }
+
+    .poster img {
+      max-width: 100vw;   /* ✅ screen width la fit */
+      max-height: 100vh;  /* ✅ screen height la fit */
+      height: auto;
+      width: auto;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.4);
+      border-radius: 10px;
+    }
+
+    @keyframes slideUp {
+      from { bottom: -100%; }
+      to { bottom: 0; }
+    }
+
+    /* Mobile adjustment */
+    @media (max-width: 600px) {
+      .poster img {
+        max-width: 95vw;
+        max-height: 95vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Envelope -->
+  <div class="envelope"></div>
+
+  <!-- Poster -->
+  <div class="poster">
+    <img src="poster.jpg" alt="Teachers' Day Poster">
+  </div>
+
+  <script>
+    // 5 sec ku apram wishes content ku redirect
+    setTimeout(() => {
+      window.location.href = "https://afrose-2314.github.io/wishes2/";
+    }, 7000); // 7 sec delay (2 sec envelope + 3 sec slide + 2 sec view)
+  </script>
+</body>
+</html>
