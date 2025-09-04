@@ -1,4 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Teachers' Day Wishes — Coding Club</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f8f9ff;
+      overflow-x: hidden;
+    }
+    #glitter, #confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+    }
+    #preview.hidden { display: none; }
+    #preview {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.92);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      padding: 2rem;
+      text-align: center;
+    }
+    button {
+      margin: .5rem;
+      padding: .7rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #4f46e5;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background: #4338ca; }
+  </style>
+</head>
+<body>
 
+<canvas id="glitter"></canvas>
+<canvas id="confetti"></canvas>
+
+<div class="container">
+  <h1>🌸 Teachers' Day Wishes</h1>
+  <input id="teacherName" type="text" placeholder="Enter teacher's name"/>
+  <br/>
+  <button id="createBtn">Create Wish</button>
+  <button id="resetBtn">Reset</button>
+</div>
+
+<div id="preview" class="hidden">
+  <div id="wishBody"></div>
+  <br/>
+  <button id="closeBtn">Close</button>
+</div>
+
+<script>
 /* ===== UTIL ===== */
 const $ = (sel) => document.querySelector(sel);
 const teacherNameInput = $('#teacherName');
@@ -8,6 +78,7 @@ const closeBtn = $('#closeBtn');
 const preview = $('#preview');
 const wishBody = $('#wishBody');
 
+/* ===== TITLE CASE ===== */
 function titleCase(str){
   return str
     .trim()
@@ -17,19 +88,19 @@ function titleCase(str){
     .join(' ');
 }
 
-/* ===== GLITTER BACKGROUND (canvas) ===== */
+/* ===== GLITTER BACKGROUND ===== */
 (() => {
   const canvas = document.getElementById('glitter');
   const ctx = canvas.getContext('2d', { alpha: true });
   let w, h, particles;
-  const density = 0.00018; // particles per pixel
+  const density = 0.00018;
   const TAU = Math.PI * 2;
 
   function resize(){
     w = canvas.width = innerWidth;
     h = canvas.height = innerHeight;
     const count = Math.max(120, Math.floor(w * h * density));
-    particles = new Array(count).fill(0).map(() => ({
+    particles = Array.from({length: count}, () => ({
       x: Math.random()*w,
       y: Math.random()*h,
       r: Math.random()*1.2 + 0.3,
@@ -39,7 +110,7 @@ function titleCase(str){
     }));
   }
 
-  function step(t){
+  function step(){
     ctx.clearRect(0,0,w,h);
     ctx.globalCompositeOperation = 'lighter';
     for(const p of particles){
@@ -48,7 +119,7 @@ function titleCase(str){
       if(p.x < -5) p.x = w+5; if(p.x > w+5) p.x = -5;
       if(p.y < -5) p.y = h+5; if(p.y > h+5) p.y = -5;
 
-      const flicker = (Math.sin(p.tw)*0.5 + 0.5) * 0.8 + 0.2; // 0.2..1.0
+      const flicker = (Math.sin(p.tw)*0.5 + 0.5) * 0.8 + 0.2;
       ctx.beginPath();
       const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 10);
       grd.addColorStop(0, `rgba(255,255,255,${0.9*flicker})`);
@@ -65,7 +136,7 @@ function titleCase(str){
   resize(); step();
 })();
 
-/* ===== CONFETTI BURST ===== */
+/* ===== CONFETTI POPPERS ===== */
 function confettiBurst() {
   const canvas = document.getElementById('confetti');
   const ctx = canvas.getContext('2d');
@@ -98,7 +169,7 @@ function confettiBurst() {
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
       ctx.globalAlpha = Math.max(0, p.life/160);
-      ctx.fillStyle = ['#8ab4ff','#ff7ab6','#6ee7b7','#ffd166','#c4b5fd'][p.size|0 % 5];
+      ctx.fillStyle = ['#8ab4ff','#ff7ab6','#6ee7b7','#ffd166','#c4b5fd'][Math.floor(Math.random()*5)];
       if(p.shape === 'rect'){
         ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.7);
       } else {
@@ -124,7 +195,7 @@ function buildWish(name){
 
 function openPreview(){
   preview.classList.remove('hidden');
-  confettiBurst();
+  confettiBurst(); // 🎉 trigger poppers
 }
 
 function closePreview(){
@@ -145,12 +216,10 @@ resetBtn.addEventListener('click', () => {
 closeBtn.addEventListener('click', closePreview);
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closePreview(); });
 
-/* Small polish: press Enter to create */
 teacherNameInput.addEventListener('keydown', (e)=>{
   if(e.key === 'Enter'){ createBtn.click(); }
 });
+</script>
 
-/* Fake logout button (optional) */
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  alert('Logged out (demo).');
-});
+</body>
+</html>
