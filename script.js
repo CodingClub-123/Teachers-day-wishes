@@ -1,121 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teachers' Day Wishes</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #fff;
-      text-align: center;
-    }
-    #preview {
-      margin: 20px auto;
-      padding: 20px;
-      max-width: 500px;
-      border-radius: 12px;
-      background: #1e293b;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    canvas#confetti {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
-  </style>
-</head>
-<body>
+/* ===== UTIL ===== */
+const $ = (sel) => document.querySelector(sel);
+const teacherNameInput = $('#teacherName');
+const createBtn = $('#createBtn');
+const resetBtn = $('#resetBtn');
+const closeBtn = $('#closeBtn');
+const preview = $('#preview');
+const wishBody = $('#wishBody');
+const glitterCanvas = document.getElementById('glitter');
+const confettiCanvas = document.getElementById('confetti');
 
-  <h2>🌸 Teachers' Day Wishes 🌸</h2>
-  <button onclick="openPreview()">Create Wish</button>
+/* Keep background stable on resize (no animation) */
+function sizeCanvases() {
+  glitterCanvas.width = innerWidth;
+  glitterCanvas.height = innerHeight;
+  confettiCanvas.width = innerWidth;
+  confettiCanvas.height = innerHeight;
+}
+addEventListener('resize', sizeCanvases);
+sizeCanvases();
 
-  <div id="preview" class="hidden">
-    <h3>🎁 Your Wish</h3>
-    <p>🌸 <b>Dear Teacher,</b></p>
-    <p>Your lessons go beyond books and last a lifetime. 📖</p>
-    <p>Wishing you a very <b>Happy Teachers' Day!</b> 🎉</p>
-    <p>With respect and gratitude,<br><b>Coding Club — Department of Computer Applications</b></p>
-  </div>
-
-  <canvas id="confetti"></canvas>
-
-<script>
-function openPreview(){
-  document.getElementById("preview").classList.remove("hidden");
-  confettiBurst(); // 🎉 fire crackers immediately
+function titleCase(str) {
+  return str
+    .trim()
+    .replace(/\s+/g, ' ')
+    .split(' ')
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
+    .join(' ');
 }
 
+/* ===== QUOTES ===== */
+const quotes = [
+  "You are a guide, mentor and inspiration. 🔭",
+  "Teaching is the one profession that creates all other professions. ✨",
+  "A teacher plants the seeds of knowledge that grow forever. 🌱",
+  "You don’t just teach — you inspire dreams. 🌟",
+  "A teacher takes a hand, opens a mind, and touches a heart. 💖",
+  "Knowledge shared by you is a treasure for life. 📚",
+  "Great teachers shape great futures. 🚀",
+  "Your wisdom lights the path for many. 🕯️",
+  "A teacher’s impact lasts a lifetime. ⏳",
+  "You teach not just lessons, but life. 🌍",
+  "Every day you make a difference. 🌈",
+  "Good teachers are the reason why ordinary students dream big. 💭",
+  "Your guidance is a priceless gift. 🎁",
+  "Teachers like you turn learning into joy. 🎶",
+  "Behind every successful student is a caring teacher. 🌹",
+  "You inspire curiosity, courage, and confidence. 🔑",
+  "The world needs more teachers like you. 🌎",
+  "A teacher is a compass that activates the magnets of curiosity. 🧭",
+  "You don’t just educate, you empower. 💪",
+  "Your lessons go beyond books and last a lifetime. 📖"
+];
+
+function getRandomQuote() {
+  return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+/* ===== WISH GENERATION ===== */
+function buildWish(name) {
+  const n = name ? titleCase(name) : 'Teacher';
+  const randomQuote = getRandomQuote();
+  return `
+    <p>🌸 <strong>Dear ${n}</strong>,</p>
+    <p>${randomQuote}</p>
+    <p>Wishing you a very <strong>Happy Teachers' Day!</strong> 🎉</p>
+    <p>With respect and gratitude,</p>
+    <p><strong>Coding Club — Department of Computer Applications</strong><br/>PSVASC</p>`;
+}
+
+function openPreview() {
+  preview.classList.remove('hidden');
+  confettiBurst(); // Fire poppers when wish opens
+}
+
+function closePreview() {
+  preview.classList.add('hidden');
+}
+
+/* ===== EVENTS ===== */
+createBtn.addEventListener('click', () => {
+  const val = teacherNameInput.value.trim();
+  wishBody.innerHTML = buildWish(val);
+  openPreview();
+});
+
+resetBtn.addEventListener('click', () => {
+  teacherNameInput.value = '';
+  teacherNameInput.focus();
+});
+
+closeBtn.addEventListener('click', closePreview);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePreview();
+});
+
+/* Press Enter to create */
+teacherNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') createBtn.click();
+});
+
+/* ===== STATIC GLITTER BACKGROUND (subtle, non-animated) ===== */
+(function drawGlitter() {
+  const ctx = glitterCanvas.getContext('2d', { alpha: true });
+  const w = glitterCanvas.width;
+  const h = glitterCanvas.height;
+
+  // Light dusted stars — draw once (no animation)
+  const density = 0.00012;
+  const count = Math.max(100, Math.floor(w * h * density));
+  const TAU = Math.PI * 2;
+  for (let i = 0; i < count; i++) {
+    const x = Math.random() * w;
+    const y = Math.random() * h;
+    const r = Math.random() * 0.9 + 0.3;
+    ctx.beginPath();
+    const grd = ctx.createRadialGradient(x, y, 0, x, y, r * 10);
+    grd.addColorStop(0, 'rgba(255,255,255,0.9)');
+    grd.addColorStop(0.3, 'rgba(255,240,210,0.35)');
+    grd.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grd;
+    ctx.arc(x, y, r * 10, 0, TAU);
+    ctx.fill();
+  }
+})();
+
+/* ===== CONFETTI BURST ===== */
 function confettiBurst() {
-  const canvas = document.getElementById('confetti');
-  const ctx = canvas.getContext('2d');
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+  const ctx = confettiCanvas.getContext('2d');
+  const w = confettiCanvas.width;
+  const h = confettiCanvas.height;
 
+  const palette = ['#8ab4ff', '#ff7ab6', '#6ee7b7', '#ffd166', '#c4b5fd'];
   const pieces = [];
-  const colors = ['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff7ab6'];
-
-  // 💥 Big burst
-  for (let i = 0; i < 200; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 12 + 6; // more speed for explosion
+  for (let i = 0; i < 240; i++) {
     pieces.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      g: 0.3,
-      size: Math.random() * 8 + 4,
-      life: 80 + Math.random() * 50,
-      color: colors[Math.floor(Math.random() * colors.length)],
+      x: w / 2,
+      y: h / 2 - 40,
+      vx: (Math.random() * 2 - 1) * (Math.random() * 8 + 3),
+      vy: Math.random() * -8 - 4,
+      g: 0.22 + Math.random() * 0.08,
+      size: Math.random() * 6 + 3,
       rot: Math.random() * Math.PI,
-      vr: (Math.random() * 0.2 - 0.1),
-      shape: Math.random() < 0.5 ? 'rect' : 'circle'
+      vr: Math.random() * 0.2 - 0.1,
+      life: 120 + Math.random() * 40,
+      shape: Math.random() < 0.3 ? 'circle' : 'rect',
+      color: palette[Math.floor(Math.random() * palette.length)]
     });
   }
 
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let alive = false;
-
+  let frames = 0;
+  (function tick() {
+    frames++;
+    ctx.clearRect(0, 0, w, h);
     for (const p of pieces) {
-      if (p.life > 0) {
-        alive = true;
-        p.vy += p.g;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        p.life--;
+      p.vy += p.g;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life--;
 
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.globalAlpha = Math.max(0, p.life / 100);
-        ctx.fillStyle = p.color;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, p.life / 160);
+      ctx.fillStyle = p.color;
 
-        if (p.shape === 'rect') {
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size*0.7);
-        } else {
-          ctx.beginPath();
-          ctx.arc(0, 0, p.size/2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
+      if (p.shape === 'rect') {
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 1.6, 0, Math.PI * 2);
+        ctx.fill();
       }
+      ctx.restore();
     }
-
-    if (alive) requestAnimationFrame(animate);
-    else ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  animate();
-}
-</script>
-</body>
-</html>
+    if (frames < 220) requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, w, h);
+  })();
+    }
